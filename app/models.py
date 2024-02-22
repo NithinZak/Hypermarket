@@ -3,8 +3,6 @@ from django.utils import timezone
 from django.contrib.auth.models import BaseUserManager,AbstractBaseUser,PermissionsMixin
 
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 # Create your models here.
 class CustomUserManager(BaseUserManager):
@@ -54,7 +52,8 @@ class Product(models.Model):
     category=models.ForeignKey(Category, on_delete=models.CASCADE)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.IntegerField()
+    offerprice = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
+    quantity = models.PositiveIntegerField()
     is_out_of_stock = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
@@ -62,10 +61,28 @@ class Product(models.Model):
             self.is_out_of_stock = True
         elif self.quantity > 0:
             self.is_out_of_stock = False
+        if self.offerprice is not None and self.offerprice < self.price:
+                if not self.offer_set.exists():
+                    
+                    offer = Offer(product=self)
+                    offer.save()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
+
+class Offer(models.Model):
+    product=models.ForeignKey(Product,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.product.name
+    
+    def delete(self, *args, **kwargs):
+        product = self.product
+        super().delete(*args, **kwargs)
+        product.offerprice = product.price
+        product.save()
 
 class Purchase(models.Model):
     name = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -107,3 +124,6 @@ class CartItem(models.Model):
         self.total_price = self.product.price * self.quantity
         super(CartItem, self).save(*args, **kwargs)
         self.cart.update_total_price()
+
+
+

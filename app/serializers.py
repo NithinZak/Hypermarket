@@ -6,7 +6,6 @@ from django.contrib.auth import authenticate
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-
     class Meta:
         model = models.CustomUser
         fields = ['username', 'email', 'password','first_name','last_name']
@@ -83,7 +82,14 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = models.CartItem
         fields = ['id', 'cart', 'productname', 'quantity']
 
+class ListOfferSerializer(serializers.ModelSerializer):
+    productname = serializers.CharField(source='product.name', read_only=True)
+    class Meta:
+        model = models.Offer
+        fields = '__all__'
+
 class BuyProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Purchase
         fields = ['name','product','quantity']
+

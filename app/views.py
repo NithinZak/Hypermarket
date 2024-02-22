@@ -123,7 +123,14 @@ class DesplayProducts(generics.ListAPIView):
     def get_queryset(self):
         queryset = models.Product.objects.all()
         return queryset
-    
+
+class ListOffers(generics.ListAPIView):
+    serializer_class = serializers.ListOfferSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = models.Offer.objects.all()
+        return queryset
 
 class AddToCart(generics.CreateAPIView):
     serializer_class = serializers.CartItemSerializer
@@ -155,18 +162,13 @@ class AddToCart(generics.CreateAPIView):
             return Response({'error':'That much product not available'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
-# class BuyProduct(APIView):
-#     def post(self, request, format=None):
-#         user = request.user
-#         product_id = self.kwargs.get('product_id')
-#         products = get_object_or_404(models.Product, pk=product_id)
-#         serializer = serializers.BuyProductSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.validated_data['name']=user
-#             serializer.validated_data['product']=products
-#             serializer.validated_data['quantity']=products.quantity
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
+class CartItemsListview(generics.ListAPIView):
+    serializer_class=serializers.CartItemSerializer
+    queryset=models.CartItem.objects.all()
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        user=self.request.user
+        query=models.CartItem.objects.filter(cart__user=user)
+        return query
