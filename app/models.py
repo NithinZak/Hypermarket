@@ -1,6 +1,13 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import BaseUserManager,AbstractBaseUser,PermissionsMixin
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import qrcode
+from PIL import Image
+from io import BytesIO
+from django.core.files import File
+
 
 
 
@@ -55,6 +62,8 @@ class Product(models.Model):
     offerprice = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True)
     quantity = models.PositiveIntegerField()
     is_out_of_stock = models.BooleanField(default=False)
+    qr_code = models.ImageField(upload_to='product_qrcodes', blank=True, null=True)
+
 
     def save(self, *args, **kwargs):
         if self.quantity == 0:
@@ -71,6 +80,27 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+@receiver(post_save, sender=Product)
+def generate_qr_code(sender, instance, created, **kwargs):
+        if created:  
+            product_id = instance.pk
+            data = product_id
+
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(data)
+            qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white")
+
+            buffer = BytesIO()
+            qr_img.save(buffer, format='PNG')
+
+            instance.qr_code.save(f'product_{product_id}_qr.png', File(buffer), save=True)
+
 
 class Offer(models.Model):
     product=models.ForeignKey(Product,on_delete=models.CASCADE)
