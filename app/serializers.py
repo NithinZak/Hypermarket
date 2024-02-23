@@ -93,3 +93,8 @@ class BuyProductSerializer(serializers.ModelSerializer):
         model = models.Purchase
         fields = ['name','product','quantity']
 
+class productDetailSerilizer(serializers.ModelSerializer):
+    categoryname = serializers.CharField(source='category.category', read_only=True)
+    class Meta:
+        model = models.Product
+        fields = ['name','categoryname','description','price','offerprice','is_out_of_stock']

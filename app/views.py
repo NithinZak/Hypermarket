@@ -1,3 +1,5 @@
+
+
 from django.shortcuts import get_object_or_404, render
 from rest_framework import generics
 from . import serializers 
@@ -123,6 +125,13 @@ class DesplayProducts(generics.ListAPIView):
     def get_queryset(self):
         queryset = models.Product.objects.all()
         return queryset
+    
+# class ProductDetailView(generics.RetrieveAPIView):
+#     serializer_class = serializers.ProductSerializer
+#     permission_classes = [IsAuthenticated]
+#     def get_queryset(self):
+#         queryset = models.Product.objects.filter(pk='product_id')
+#         return queryset
 
 class ListOffers(generics.ListAPIView):
     serializer_class = serializers.ListOfferSerializer
@@ -172,3 +181,9 @@ class CartItemsListview(generics.ListAPIView):
         user=self.request.user
         query=models.CartItem.objects.filter(cart__user=user)
         return query
+    
+class ProductDetailView(generics.RetrieveAPIView):
+    serializer_class=serializers.productDetailSerilizer
+    queryset=models.Product.objects.all()
+    permission_classes = [IsAuthenticated]
+   

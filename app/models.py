@@ -154,6 +154,3 @@ class CartItem(models.Model):
         self.total_price = self.product.price * self.quantity
         super(CartItem, self).save(*args, **kwargs)
         self.cart.update_total_price()
-
-
-
