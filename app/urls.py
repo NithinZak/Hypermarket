@@ -16,6 +16,12 @@ urlpatterns=[
     path('DesplayProducts/',views.DesplayProducts.as_view(),name='DesplayProducts'),
     path('AddToCart/<int:product_id>/<int:quantity>/',views.AddToCart.as_view(),name='AddToCart'),
     path('CartItemsListview/',views.CartItemsListview.as_view(),name='CartItemsListview'),
+    path('CartItemDelete/<int:pk>/',views.CartItemDelete.as_view(),name='CartItemDelete'),
     path('ListOffers/',views.ListOffers.as_view(),name='ListOffers'),
-    path('ProductDetailView/<int:pk>/',views.ProductDetailView.as_view(),name='ProductDetailView')
+    path('ProductDetailView/<int:pk>/',views.ProductDetailView.as_view(),name='ProductDetailView'), 
+    path('CategoryList/',views.CategoryList.as_view(),name='CategoryList'),
+    path('ListProductWithCategory/<int:cat_id>/',views.ListProductWithCategory.as_view(),name='ListProductWithCategory'),
+    path('AddToPurchase/',views.AddToPurchase.as_view(),name='AddToPurchase'),
+    path('PurchaseListUser/',views.PurchaseListUser.as_view(),name='PurchaseListUser'),
+    path('SearchAPIView/',views.SearchAPIView.as_view(),name='SearchAPIView'),
     ]

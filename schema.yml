@@ -1,0 +1,754 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /AddToCart/{product_id}/{quantity}/:
+    post:
+      operationId: AddToCart_create
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: quantity
+        schema:
+          type: integer
+        required: true
+      tags:
+      - AddToCart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CartItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CartItem'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+  /AddToPurchase/:
+    post:
+      operationId: AddToPurchase_create
+      tags:
+      - AddToPurchase
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /CartItemDelete/{id}/:
+    delete:
+      operationId: CartItemDelete_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - CartItemDelete
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /CartItemsListview/:
+    get:
+      operationId: CartItemsListview_retrieve
+      tags:
+      - CartItemsListview
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+  /CategoryList/:
+    get:
+      operationId: CategoryList_retrieve
+      tags:
+      - CategoryList
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /DesplayProducts/:
+    get:
+      operationId: DesplayProducts_retrieve
+      tags:
+      - DesplayProducts
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductList'
+          description: ''
+  /ListOffers/:
+    get:
+      operationId: ListOffers_retrieve
+      tags:
+      - ListOffers
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOffer'
+          description: ''
+  /ListProductWithCategory/{cat_id}/:
+    get:
+      operationId: ListProductWithCategory_retrieve
+      parameters:
+      - in: path
+        name: cat_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - ListProductWithCategory
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /PaymentList/:
+    get:
+      operationId: PaymentList_retrieve
+      tags:
+      - PaymentList
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /ProductAPIView/:
+    get:
+      operationId: ProductAPIView_retrieve
+      tags:
+      - ProductAPIView
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: ProductAPIView_create
+      tags:
+      - ProductAPIView
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /ProductDelete/{id}/:
+    delete:
+      operationId: ProductDelete_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - ProductDelete
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /ProductDetailView/{id}/:
+    get:
+      operationId: ProductDetailView_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - ProductDetailView
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/productDetail'
+          description: ''
+  /ProductOutOfStock/:
+    get:
+      operationId: ProductOutOfStock_retrieve
+      tags:
+      - ProductOutOfStock
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /ProductUpdate/{id}/:
+    get:
+      operationId: ProductUpdate_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - ProductUpdate
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductUpdate'
+          description: ''
+    put:
+      operationId: ProductUpdate_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - ProductUpdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductUpdate'
+          description: ''
+    patch:
+      operationId: ProductUpdate_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - ProductUpdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProductUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProductUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductUpdate'
+          description: ''
+  /PurchaseList/:
+    get:
+      operationId: PurchaseList_retrieve
+      tags:
+      - PurchaseList
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /UserList/:
+    get:
+      operationId: UserList_retrieve
+      tags:
+      - UserList
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/token/:
+    post:
+      operationId: api_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/token/refresh/:
+    post:
+      operationId: api_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/token/verify/:
+    post:
+      operationId: api_token_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
+  /login/:
+    post:
+      operationId: login_create
+      tags:
+      - login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /register/:
+    post:
+      operationId: register_create
+      tags:
+      - register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Registration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Registration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Registration'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+          description: ''
+components:
+  schemas:
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cart:
+          type: integer
+        productname:
+          type: string
+          readOnly: true
+        quantity:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+        user:
+          type: string
+          readOnly: true
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+      required:
+      - cart
+      - id
+      - price
+      - productname
+      - total_price
+      - user
+      - user_id
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          type: string
+          maxLength: 30
+        image:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - category
+      - id
+    ListOffer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        productname:
+          type: string
+          readOnly: true
+        product:
+          type: integer
+      required:
+      - id
+      - product
+      - productname
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - username
+    PatchedProductUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        quantity:
+          type: integer
+        is_out_of_stock:
+          type: boolean
+        offerprice:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+    Product:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        category:
+          type: integer
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        quantity:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+        is_out_of_stock:
+          type: boolean
+        product_id:
+          type: integer
+      required:
+      - category
+      - description
+      - name
+      - price
+      - quantity
+    ProductList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product_id:
+          type: integer
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        offerprice:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        quantity:
+          type: integer
+          maximum: 4294967295
+          minimum: 0
+          format: int64
+        is_out_of_stock:
+          type: boolean
+        qr_code:
+          type: string
+          format: uri
+          nullable: true
+        image:
+          type: string
+          format: uri
+          nullable: true
+        category:
+          type: integer
+      required:
+      - category
+      - description
+      - id
+      - name
+      - price
+      - product_id
+      - quantity
+    ProductUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        quantity:
+          type: integer
+        is_out_of_stock:
+          type: boolean
+        offerprice:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+    Registration:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 30
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+        first_name:
+          type: string
+          maxLength: 30
+        last_name:
+          type: string
+          maxLength: 30
+      required:
+      - email
+      - password
+      - username
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+      required:
+      - token
+    productDetail:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        categoryname:
+          type: string
+          readOnly: true
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        offerprice:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        is_out_of_stock:
+          type: boolean
+        product_id:
+          type: integer
+          readOnly: true
+      required:
+      - categoryname
+      - description
+      - name
+      - price
+      - product_id
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

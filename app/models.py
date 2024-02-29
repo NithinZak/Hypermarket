@@ -50,6 +50,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class Category(models.Model):
     category = models.CharField(max_length=30)
+    image = models.ImageField(upload_to='images/category/', blank=True, null=True)
 
     def __str__(self):
         return self.category
@@ -63,6 +64,7 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField()
     is_out_of_stock = models.BooleanField(default=False)
     qr_code = models.ImageField(upload_to='product_qrcodes', blank=True, null=True)
+    image = models.ImageField(upload_to='images/product/', blank=True, null=True)
 
 
     def save(self, *args, **kwargs):
@@ -126,6 +128,8 @@ class Purchase(models.Model):
     
     def save(self, *args, **kwargs):
         self.total_price = self.product.price * self.quantity
+        self.product.quantity -= self.quantity
+        self.product.save()
         super(Purchase, self).save(*args, **kwargs)
 
 class Cart(models.Model):

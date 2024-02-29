@@ -37,6 +37,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField(source='id')
     class Meta:
         model = models.Product
         fields = '__all__'
@@ -44,9 +45,22 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField(source='id',required=False)
     class Meta:
         model = models.Product
-        fields =['name','category','description','price','quantity','is_out_of_stock'] 
+        fields =['name','category','description','price','quantity','is_out_of_stock','product_id'] 
+
+class ProductUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Product
+        fields =['name','category','description','price','quantity','is_out_of_stock','offerprice']
+    category = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+    price = serializers.DecimalField(required=False, max_digits=10, decimal_places=2)
+    quantity = serializers.IntegerField(required=False)
+    name = serializers.CharField(required=False)
+    is_out_of_stock = serializers.BooleanField(required=False)
+    offerprice = serializers.DecimalField(required=False, max_digits=10, decimal_places=2)
 
 class ProductDeleteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -78,9 +92,18 @@ class PaymentListSerializer(serializers.ModelSerializer):
 
 class CartItemSerializer(serializers.ModelSerializer):
     productname = serializers.CharField(source='product.name', read_only=True)
+    price = serializers.DecimalField(source='product.price',decimal_places=2, max_digits=10, read_only=True)
+    user = serializers.CharField(source='cart.user', read_only=True)
+    user_id = serializers.IntegerField(source='cart.user.id', read_only=True)
+    total_price = serializers.DecimalField(source='cart.total_price',decimal_places=2, max_digits=10, read_only=True)
     class Meta:
         model = models.CartItem
-        fields = ['id', 'cart', 'productname', 'quantity']
+        fields = ['id', 'cart', 'productname', 'quantity','user','total_price','price','user_id']
+
+class CartItemDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CartItem
+        fields = []
 
 class ListOfferSerializer(serializers.ModelSerializer):
     productname = serializers.CharField(source='product.name', read_only=True)
@@ -93,8 +116,27 @@ class BuyProductSerializer(serializers.ModelSerializer):
         model = models.Purchase
         fields = ['name','product','quantity']
 
-class productDetailSerilizer(serializers.ModelSerializer):
+class productDetailSerializer(serializers.ModelSerializer):
     categoryname = serializers.CharField(source='category.category', read_only=True)
+    product_id = serializers.IntegerField(source='id', read_only=True)
     class Meta:
         model = models.Product
-        fields = ['name','categoryname','description','price','offerprice','is_out_of_stock']
+        fields = ['name','categoryname','description','price','offerprice','is_out_of_stock','product_id']
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Category
+        fields = '__all__'
+
+class AddToPurchaseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Purchase
+        fields = ['name','product','quantity',]
+
+class PurchaseListUserSerializer(serializers.ModelSerializer):
+    # product_name = serializers.IntegerField(source='product.name', read_only=True)
+    price = serializers.DecimalField(source='product.price',decimal_places=2, max_digits=10, read_only=True)
+    class Meta:
+        model = models.Purchase
+        fields = ['product','quantity','price']

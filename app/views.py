@@ -69,21 +69,32 @@ class UserLoginView(generics.GenericAPIView):
 class ProductAPIView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, format=None):
-        serializer = serializers.ProductSerializer(data=request.data)
-        if serializer.is_valid():
-            if serializer.validated_data['quantity'] == 0:
-                serializer.validated_data['is_out_of_stock'] = True
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+        try:
+            serializer = serializers.ProductSerializer(data=request.data)
+            if serializer.is_valid():
+                if serializer.validated_data['quantity'] == 0:
+                    serializer.validated_data['is_out_of_stock'] = True
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+        except:
+             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+
     
     def get(self, request, format=None):
-        products = models.Product.objects.all()
-        serializer = serializers.ProductSerializer(products, many=True)
-        return Response(serializer.data)
+        try:
+            products = models.Product.objects.all()
+            serializer = serializers.ProductSerializer(products, many=True)
+            if serializer.data:
+                return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+            else:
+                return Response({"status":0,"Message":"No product"},status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response({"Message":"Somthing went wrong"},status=status.HTTP_204_NO_CONTENT)
+            
 
 class ProductUpdate(generics.RetrieveUpdateAPIView):
-    serializer_class = serializers.ProductSerializer
+    serializer_class = serializers.ProductUpdateSerializer
     permission_classes = [IsAuthenticated]
     queryset = models.Product.objects.all()
 
@@ -93,55 +104,83 @@ class ProductDelete(generics.DestroyAPIView):
     queryset = models.Product.objects.all()
     
 class ProductOutOfStock(APIView):
+    permission_classes =[IsAuthenticated]
     def get(self, request, format=None):
-        products = models.Product.objects.filter(is_out_of_stock = True)
-        serializer = serializers.ProductSerializer(products, many = True)
-        return Response(serializer.data)
-    
+        try:
+            products = models.Product.objects.filter(quantity__lt=10)
+            serializer = serializers.ProductSerializer(products, many = True)
+            if serializer.data:
+                return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+            else:
+                return Response({"status":0,"Message":"No Products"},status=status.HTTP_200_OK)
+        except:
+            return Response({"error":"Somthing went wrong"})
+        
 class UserList(APIView):
+    permission_classes =[IsAuthenticated]
     def get(self, request, format=None):
         users = models.CustomUser.objects.all()
         serializer = serializers.UserListSerializer(users, many = True)
-        return Response(serializer.data)
+        if serializer.data:
+            return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+        else:
+            return Response({"status":0,"Message":"No User"},status=status.HTTP_200_OK)
     
 class PurchaseList(APIView):
+    permission_classes =[IsAuthenticated]
     def get(self, request, format=None):
         purchases = models.Purchase.objects.all()
         serializer = serializers.PurchaseListSerializer(purchases, many = True)
-        return Response(serializer.data)
+        if serializer.data:
+            return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+        else:
+            return Response({"status":0,"Message":"No Purchases"},status=status.HTTP_200_OK)
 
 class PaymentList(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         payments = models.Purchase.objects.all()
         serializer = serializers.PaymentListSerializer(payments, many = True)
-        return Response(serializer.data)
+        if serializer.data:
+            return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+        else:
+            return Response({"status":0,"Message":"No Payments"},status=status.HTTP_200_OK)
 
 #user start--------------------------------------------------------------- 
 
-class DesplayProducts(generics.ListAPIView):
+class DesplayProducts(APIView):
     serializer_class = serializers.ProductListSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        queryset = models.Product.objects.all()
-        return queryset
-    
-# class ProductDetailView(generics.RetrieveAPIView):
-#     serializer_class = serializers.ProductSerializer
-#     permission_classes = [IsAuthenticated]
-#     def get_queryset(self):
-#         queryset = models.Product.objects.filter(pk='product_id')
-#         return queryset
+    def get(self,request, format=None):
+        try:
+            queryset = models.Product.objects.all()
+            serializer = self.serializer_class(queryset, many=True)
+            if serializer.data:
+                return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+            else:
+                return Response({"status":0,"Message":"No products"},status=status.HTTP_200_OK)
+        except:
+            return Response({"Message":"somthing went wrong"})
 
-class ListOffers(generics.ListAPIView):
+class ListOffers(APIView):
     serializer_class = serializers.ListOfferSerializer
     permission_classes = [IsAuthenticated]
+    
+    def get(self,request,format=None):
+        try:
+            queryset = models.Offer.objects.all()
+            serializer = self.serializer_class(queryset, many=True)
+            if serializer.data:
+                return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+            else:
+                return Response({"status":0,"Message":"No Offer"})
 
-    def get_queryset(self):
-        queryset = models.Offer.objects.all()
-        return queryset
+        except models.Offer.DoesNotExist:
+            return Response({"Message":"No Offer"})
 
 class AddToCart(generics.CreateAPIView):
+    permission_classes =[IsAuthenticated]
     serializer_class = serializers.CartItemSerializer
 
     def post(self, request, *args, **kwargs):     
@@ -149,8 +188,6 @@ class AddToCart(generics.CreateAPIView):
         product_id = self.kwargs.get('product_id')
         products = get_object_or_404(models.Product, pk=product_id)
         quantity = self.kwargs.get('quantity')
-        print('------------------------------------')
-        print(products)
         if quantity <= products.quantity:
             if not product_id:
                 return Response({'error': 'Product ID is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -172,18 +209,109 @@ class AddToCart(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
 
-class CartItemsListview(generics.ListAPIView):
+class CartItemsListview(APIView):
     serializer_class=serializers.CartItemSerializer
     queryset=models.CartItem.objects.all()
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        user=self.request.user
-        query=models.CartItem.objects.filter(cart__user=user)
-        return query
-    
-class ProductDetailView(generics.RetrieveAPIView):
-    serializer_class=serializers.productDetailSerilizer
-    queryset=models.Product.objects.all()
+    def get(self,request,format=None):
+        try:
+            user=self.request.user
+            query=models.CartItem.objects.filter(cart__user=user)
+            serializer = self.serializer_class(query, many=True)
+            if serializer.data:
+                return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+            else:
+                return Response({"status":0,"Messtage":"No items in cart"})
+        except:
+            return Response({"Message":"somthing went wrong"})
+        
+class CartItemDelete(generics.DestroyAPIView):
+    serializer_class = serializers.CartItemDeleteSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = models.CartItem.objects.all()
+   
+        
+class ProductDetailView(APIView):
+    serializer_class=serializers.productDetailSerializer
     permission_classes = [IsAuthenticated]
    
+    def get(self,request,pk,format=None):
+        try:
+            query = models.Product.objects.get(id=pk)
+            serializer = self.serializer_class(query)
+            if serializer.data:
+                return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+        except models.Product.DoesNotExist:
+            return Response({"status":0,"Message":"Product does not exist"})
+
+class CategoryList(APIView):
+    serializer_class = serializers.CategorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,format=None):
+        try:
+            query = models.Category.objects.all()
+            serializer = self.serializer_class(query,many=True)
+            if serializer.data:
+                return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+            else:
+                return Response({"status":0,"Message":"No category"},status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response({"status":0,"Message":"TRY AGAIN"},status=status.HTTP_400_BAD_REQUEST)
+    
+class ListProductWithCategory(APIView):
+    serializer_class = serializers.ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, cat_id, format=None):
+        try:
+            category = models.Category.objects.get(pk=cat_id)
+            products = models.Product.objects.filter(category=category)
+            serializer = self.serializer_class(products, many=True)
+            
+            if serializer.data:
+                for product_data in serializer.data:
+                    product_data['product_id'] = product_data['id']
+                return Response({"status": 1, "data": serializer.data}, status=status.HTTP_200_OK)
+            else:
+                return Response({"status": 0, "message": "No Products"}, status=status.HTTP_204_NO_CONTENT)
+        except models.Category.DoesNotExist:
+            return Response({"status": 0, "message": "Category not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class AddToPurchase(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        serializer = serializers.AddToPurchaseSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status":1,"data":serializer.data,"message":"Added to Purchase"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class PurchaseListUser(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.PurchaseListUserSerializer
+    def get(self, request, format = None):
+        query = models.Purchase.objects.filter(name=request.user)
+        serializer = self.serializer_class(query, many=True)
+        if serializer.data:
+            return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+        else:
+            return Response({"status":0,"message":"No Purchase"})
+
+
+class SearchAPIView(APIView):
+    serializer_class = serializers.ProductListSerializer
+    queryset = models.Product.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        try:
+            query = request.query_params.get('q', '') 
+            product = models.Product.objects.filter(name__icontains=query)
+            if product:
+                serializer = self.serializer_class(product, many=True)
+                return Response({"status":1,"data":serializer.data},status=status.HTTP_200_OK)
+            else:
+                return Response({"status":0,"message": "No products found."}, status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({"message":"somthing went wrong"})
